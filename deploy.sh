@@ -1,23 +1,28 @@
-# Save the key to a file
 echo "${KEY}" > key.pem
-
-# Set the correct permissions for the key file
 chmod 400 key.pem
-
-# Copy the build files to the remote server
 scp -o StrictHostKeyChecking=no -i key.pem -r build/* ${USERNAME}@${HOST}:/var/www/html/
+ssh -o StrictHostKeyChecking=no -i key.pem ${USERNAME}@${HOST} << 'EOF'
+  cd /var/www/html
 
-# Copy the deploy script to the remote server
-scp -o StrictHostKeyChecking=no -i key.pem ./deploy.sh ${USERNAME}@${HOST}:/tmp/
+  # Check if Node.js and npm are installed, and install them if not
+  if ! command -v node &> /dev/null
+  then
+    echo "Node.js is not installed. Installing..."
+    curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+  else
+    echo "Node.js is already installed."
+  fi
 
-# Execute the deploy script on the remote server
-ssh -o StrictHostKeyChecking=no -i key.pem ${USERNAME}@${HOST} 'bash /tmp/deploy.sh'
+  if ! command -v npm &> /dev/null
+  then
+    echo "npm is not installed. Installing..."
+    sudo apt-get install -y npm
+  else
+    echo "npm is already installed."
+  fi
 
-# Specify the shell to use
-shell: /usr/bin/bash -e {0}
-
-# Define environment variables
-env:
-  HOST: ***
-  USERNAME: ***
-  KEY: ***
+  # Install dependencies and start the application
+  npm install --production
+  npm run start
+EOF
