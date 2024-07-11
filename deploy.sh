@@ -1,13 +1,23 @@
+# Save the key to a file
 echo "${KEY}" > key.pem
+
+# Set the correct permissions for the key file
 chmod 400 key.pem
 
+# Copy the build files to the remote server
 scp -o StrictHostKeyChecking=no -i key.pem -r build/* ${USERNAME}@${HOST}:/var/www/html/
 
-ssh -o StrictHostKeyChecking=no -i key.pem ${USERNAME}@${HOST} << 'EOF'
-  cd /var/www/html
-  if ! command -v npm &> /dev/null
-  then
-    curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-    sudo apt-get install -y nodejs
-  fi
-  npm install --production
+# Copy the deploy script to the remote server
+scp -o StrictHostKeyChecking=no -i key.pem ./deploy.sh ${USERNAME}@${HOST}:/tmp/
+
+# Execute the deploy script on the remote server
+ssh -o StrictHostKeyChecking=no -i key.pem ${USERNAME}@${HOST} 'bash /tmp/deploy.sh'
+
+# Specify the shell to use
+shell: /usr/bin/bash -e {0}
+
+# Define environment variables
+env:
+  HOST: ***
+  USERNAME: ***
+  KEY: ***
