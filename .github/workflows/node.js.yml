@@ -36,5 +36,5 @@ jobs:
         echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
         chmod 600 private_key.pem
         scp -o StrictHostKeyChecking=no -i private_key.pem -r build/* $EC2_USER@$EC2_HOST:/var/www/html/
-        ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST "sudo chown -R ec2-user:ec2-user /var/www/html && sudo chmod -R 755 /var/www/html"
+        ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST "sudo chown -R ubuntu:ubuntu /var/www/html && sudo chmod -R 755 /var/www/html"
         rm private_key.pem
