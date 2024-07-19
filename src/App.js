@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-//import logo from './logo.svg';
 import './App.css';
 import React from 'react';
 import VideoPlayer from './VideoPlayer';
@@ -16,5 +14,3 @@ const App = () => {
 };
 
 export default App;
-=======
->>>>>>> 1d7ceaeed21bc37c8eff8d56f62a44c25f84a880
