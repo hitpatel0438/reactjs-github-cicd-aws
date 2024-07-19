@@ -1,0 +1,32 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  SSH_USER: ubuntu
+  SSH_HOST: 13.233.91.142
+  SSH_PORT: 22
+  REACT_APP_DIR: /var/www/html/
+
+before_script:
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+  - eval $(ssh-agent -s)
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
+
+build:
+  stage: build
+  image: node:14
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - build/
+
+deploy:
+  stage: deploy
+  script:
+    - scp -r -o StrictHostKeyChecking=no build/* $SSH_USER@$SSH_HOST:$REACT_APP_DIR/
